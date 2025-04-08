@@ -1,45 +1,32 @@
 package com.raxat.oauthlib.services;
 
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
-import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.stereotype.Service;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.UUID;
 
-import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
+import com.raxat.oauthlib.models.OAuth2Client;
+import com.raxat.oauthlib.repositories.ClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.stereotype.Service;
 
 @Service
 public class OAuth2FlowService {
 
-    private final OAuth2AuthorizationService authorizationService;
+    private final ClientRepository clientRepository;
 
-    public OAuth2FlowService(OAuth2AuthorizationService authorizationService) {
-        this.authorizationService = authorizationService;
+    public OAuth2FlowService(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
     }
 
-    /**
-     * Создание access_token и refresh_token.
-     * Dev2 должен убедиться, что код (authorization_code) валиден.
-     */
-    public OAuth2AccessTokenResponse generateTokenResponse(String code) {
-        OAuth2Authorization authorization = authorizationService.findByToken(code, AUTHORIZATION_CODE);
-        if (authorization == null) {
-            throw new InvalidGrantException("Invalid authorization code");
-        }
+    public RegisteredClient validateClient(String clientId, String clientSecret) {
+        // Реализация проверки клиента
+        return clientRepository.findByClientId(clientId)
+                .map(this::toRegisteredClient)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+    }
 
-        OAuth2AccessToken accessToken = new OAuth2AccessToken(
-                OAuth2AccessToken.TokenType.BEARER,
-                "access-token-" + UUID.randomUUID(),
-                Instant.now(),
-                Instant.now().plus(Duration.ofMinutes(15))  // 15 минут жизни
-        );
-
-        return OAuth2AccessTokenResponse.withToken(accessToken.getTokenValue())
-                .tokenType(accessToken.getTokenType())
-                .expiresIn(accessToken.getExpiresAt().getEpochSecond())
+    private RegisteredClient toRegisteredClient(OAuth2Client client) {
+        // Конвертация из OAuth2Client в RegisteredClient
+        return RegisteredClient.withId(client.getId().toString())
+                .clientId(client.getClientId())
+                .clientSecret(client.getClientSecret())
                 .build();
     }
 }
