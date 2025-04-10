@@ -1,0 +1,23 @@
+# src/main/resources/application.yml
+webСlient:
+  base-url: https://api.example.com # Базовый URL для WebClient
+  response-timeout: 30              # Таймаут на ответ от сервера (в секундах)
+  max-connections: 100              # Максимум одновременных соединений
+  ssl: true                         # Включение SSL
+  retry:
+    attempts: 3                     # Количество попыток при сетевых ошибках
+    backoff: 1                      # Время ожидания между попытками (в секундах)
+  max-in-memory-size: 16777216      # Максимальный размер памяти для кодеков (16 МБ) (по умолчанию 256КБ)
+
+logging:
+  level:
+    com.raxat.oauthlib.service.AuditService: INFO                       # Логирование для AuditService
+    org.springframework.web.reactive.function.client.WebClient: DEBUG   # Логирование для WebClient
+    org.springframework: WARN                                           # Логирование для Spring компонентов
+    org.hibernate: ERROR                                                # Логирование Ошибок
+
+audit:
+  log-level: DEBUG        # Уровень логирования для AuditService
+  max-logs: 100           # Максимальное количество логируемых событий
+
+
