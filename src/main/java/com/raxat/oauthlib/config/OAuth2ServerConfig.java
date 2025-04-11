@@ -13,8 +13,8 @@ import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
-import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -30,7 +30,7 @@ public class OAuth2ServerConfig {
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient webClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("webapp")
-                .clientSecret("{bcrypt}\$2a\$10$XZlw9gZb4PZbBTeqNwvJKeYv6w6cQ6X9z8dZwK9LkRt1JzQ1Y6JZa")
+                .clientSecret("{bcrypt}\\$2a\\$10$XZlw9gZb4PZbBTeqNwvJKeYv6w6cQ6X9z8dZwK9LkRt1JzQ1Y6JZa")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -71,8 +71,8 @@ public class OAuth2ServerConfig {
     }
 
     @Bean
-    public ProviderSettings providerSettings() {
-        return ProviderSettings.builder()
+    public AuthorizationServerSettings providerSettings() {
+        return AuthorizationServerSettings.builder()
                 .issuer("http://auth-service:8080")
                 .build();
     }
