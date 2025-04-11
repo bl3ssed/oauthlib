@@ -5,7 +5,6 @@
     import org.springframework.stereotype.Service;
     import io.jsonwebtoken.Claims;
     import io.jsonwebtoken.Jwts;
-    import io.jsonwebtoken.SignatureAlgorithm;
 
     import javax.crypto.SecretKey;
     import java.util.Date;
