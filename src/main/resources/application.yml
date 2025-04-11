@@ -1,6 +1,6 @@
 # src/main/resources/application.yml
-webСlient:
-  base-url: https://api.example.com # Базовый URL для WebClient
+webclient:
+  base-url: http://localhost:8080 # Базовый URL для WebClient
   response-timeout: 30              # Таймаут на ответ от сервера (в секундах)
   max-connections: 100              # Максимум одновременных соединений
   ssl: true                         # Включение SSL
@@ -19,5 +19,15 @@ logging:
 audit:
   log-level: DEBUG        # Уровень логирования для AuditService
   max-logs: 100           # Максимальное количество логируемых событий
-
-
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/oauth
+    username: postgres
+    password: der333
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+jwt:
+  secret: fdsbjfg123dsgfdsgfdsgj
+  expirationMs: 99999
