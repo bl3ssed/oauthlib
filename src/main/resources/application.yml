@@ -21,13 +21,13 @@ audit:
   max-logs: 100           # Максимальное количество логируемых событий
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5434/oauth
+    url: jdbc:postgresql://localhost:5432/oauth
     username: postgres
-    password: der333
+    password: 1234
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
 jwt:
-  secret: fdsbjfg123dsgfdsgfdsgj
-  expirationMs: 99999
+  secret: fdsbjfg123dsgfdsgfdsgjnkgflhjksdfvjkhledfjkhl8943897dfsghjkedg
+  expirationMs: 3600000

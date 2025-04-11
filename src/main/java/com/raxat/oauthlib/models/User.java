@@ -1,5 +1,6 @@
 package com.raxat.oauthlib.models;
 
+import com.raxat.oauthlib.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,11 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+    public User(UserDto userDto) {
+        this.username = userDto.username();
+        this.password = userDto.password();
+        this.email = userDto.email();
     }
 
     @Override

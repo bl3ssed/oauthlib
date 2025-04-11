@@ -23,13 +23,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Пропускаем фильтрацию для эндпоинтов /register и /login
+        if (request.getRequestURI().equals("/register") ||
+                request.getRequestURI().equals("/logout") ||
+                request.getRequestURI().equals("/api/refresh") ||
+                request.getRequestURI().equals("/api/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            String username = request.getParameter("username"); // Получаем имя пользователя из запроса (если оно есть)
 
-            if (username != null && tokenService.validateToken(token, username)) {
+            String username = tokenService.extractUsername(token);
+
+            if (username != null && tokenService.validateToken(token)) {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         username, null, Collections.emptyList());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -37,6 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
+        // Пропускаем запрос дальше по цепочке фильтров
         filterChain.doFilter(request, response);
     }
 }
