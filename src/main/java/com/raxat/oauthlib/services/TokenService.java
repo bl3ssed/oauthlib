@@ -1,11 +1,14 @@
     package com.raxat.oauthlib.services;
 
+    import com.raxat.oauthlib.models.User;
+    import io.jsonwebtoken.ExpiredJwtException;
     import io.jsonwebtoken.security.Keys;
+    import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.beans.factory.annotation.Value;
+    import org.springframework.context.annotation.Lazy;
     import org.springframework.stereotype.Service;
     import io.jsonwebtoken.Claims;
     import io.jsonwebtoken.Jwts;
-    import io.jsonwebtoken.SignatureAlgorithm;
 
     import javax.crypto.SecretKey;
     import java.util.Date;
@@ -16,20 +19,28 @@
 
     @Service
     public class TokenService {
+
+        @Autowired
+        @Lazy
+        private UserService userService;
         @Value("${jwt.secret}")
         private String secret;
 
         @Value("${jwt.expirationMs}")
         private long expirationMs;  // Changed from int to long
 
-        public String generateToken(String username) {
+        public String generateToken(User user) {
             Map<String, Object> claims = new HashMap<>();
-            claims.put("sub", username);
+            claims.put("username", user.getUsername());
+            claims.put("email", user.getEmail());
+            claims.put("iat", new Date().getTime());
             return createToken(claims);
         }
+
         private SecretKey getSigningKey() {
             return Keys.hmacShaKeyFor(secret.getBytes());
         }
+
         private String createToken(Map<String, Object> claims) {
             return Jwts.builder()
                     .setClaims(claims)
@@ -64,9 +75,36 @@
             return extractClaim(token, Claims::getExpiration);
         }
 
-        public boolean validateToken(String token, String username) {
-            final String extractedUsername = extractUsername(token);
-            return (extractedUsername != null && extractedUsername.equals(username) && !isTokenExpired(token));
+        // Убираем параметр username
+        public boolean validateToken(String token) {
+            final String username = extractUsername(token);
+            return (username != null && !isTokenExpired(token));
         }
 
+        public String refreshToken(String token) {
+            String username = null;
+
+            try {
+                if (isTokenExpired(token)) {
+                    // Токен ещё валиден, но уже считается просроченным — достаём обычным способом
+                    username = extractUsername(token);
+                } else {
+                    return token; // если не истёк — возвращаем его как есть
+                }
+            } catch (ExpiredJwtException e) {
+                Claims claims = e.getClaims();
+                username = (String) claims.get("username"); // или getSubject(), если ты используешь subject
+                if (username != null) {
+                    User user = userService.getUserByUsername(username);
+                    if (user != null) {
+                        return generateToken(user);
+                    }
+                }
+            }
+
+            // Попытка обновить токен
+
+            return token;
+
+        }
     }
