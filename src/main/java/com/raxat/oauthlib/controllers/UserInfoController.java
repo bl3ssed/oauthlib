@@ -28,7 +28,7 @@ public class UserInfoController {
         }
     }
 
-    // Получение пользователя по ID
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
@@ -46,7 +46,6 @@ public class UserInfoController {
         }
     }
 
-    // Удаление пользователя
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         try {
@@ -56,6 +55,7 @@ public class UserInfoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     /**
      * Эндпоинт /userinfo (OIDC-стандарт).
      * Возвращает claims из JWT (sub, email, roles).
