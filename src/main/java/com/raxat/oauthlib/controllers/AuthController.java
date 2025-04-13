@@ -1,10 +1,10 @@
 package com.raxat.oauthlib.controllers;
 
-import com.raxat.oauthlib.dto.UserDto;
+import com.raxat.oauthlib.dto.AuthRequest;
+import com.raxat.oauthlib.models.JwtToken;
 import com.raxat.oauthlib.models.User;
 import com.raxat.oauthlib.services.TokenService;
 import com.raxat.oauthlib.services.UserService;
-import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,30 +23,22 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    // Логин пользователя и получение JWT токена
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody String username, @RequestBody String password) {
-        // Проверка правильности имени пользователя и пароля
-        User user = userService.getUserByUsername(username);
 
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity.badRequest().body("Invalid username or password");
+    @PostMapping("/login")
+    public ResponseEntity<JwtToken> login(@RequestBody AuthRequest requestedUser) {
+        User user = userService.getUserByUsername(requestedUser.username());
+
+        if (user == null || !passwordEncoder.matches(requestedUser.password(), user.getPassword())) {
+            return ResponseEntity.badRequest().body(null);
         }
 
-        System.out.println(username);
-        // Генерация токена
-        String token = jwtService.generateToken(user);
-        return ResponseEntity.ok(token); // Отправляем токен
+        JwtToken token = jwtService.generateToken(user);
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<String> refreshToken(@RequestBody Map<String, String> request, @RequestBody String username) {
-        String oldToken = request.get("token");
-        String newToken = jwtService.refreshToken(oldToken);
-        if (!oldToken.equals(newToken)) {
-            return ResponseEntity.ok(newToken);
-        } else {
-            return ResponseEntity.status(400).body("Token is still valid");
-        }
+    public ResponseEntity<JwtToken> refreshToken(@RequestBody JwtToken token, @RequestBody String username) {
+        JwtToken newToken = jwtService.refreshToken(token);
+        return ResponseEntity.ok(newToken);
     }
 }

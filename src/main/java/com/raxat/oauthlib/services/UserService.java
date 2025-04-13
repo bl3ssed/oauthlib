@@ -4,6 +4,7 @@ import com.raxat.oauthlib.dto.UserDto;
 import com.raxat.oauthlib.models.User;
 import com.raxat.oauthlib.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,21 +33,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Поиск пользователя по имени
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    // Поиск пользователя по id
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
-    // Поиск пользователя по email
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    // Обновление данных пользователя
+
     public User updateUser(String username, UserDto userDto) {
         User user = getUserByUsername(username);
         if (user == null) {
@@ -61,7 +60,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Удаление пользователя по имени
+
     public void deleteUser(String username) {
         User user = getUserByUsername(username);
         if (user == null) {
@@ -78,6 +77,5 @@ public class UserService {
 
         userRepository.delete(user);
     }
-
 
 }
