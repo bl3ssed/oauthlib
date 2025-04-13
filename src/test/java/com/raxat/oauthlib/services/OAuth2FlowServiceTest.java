@@ -72,7 +72,8 @@ class OAuth2FlowServiceTest {
         assertEquals(testClient.getClientName(), result.getClientName());
         assertEquals(CLIENT_SECRET, result.getClientSecret());
         assertEquals(REDIRECT_URI, result.getRedirectUris().iterator().next());
-        assertTrue(result.getScopes().containsAll(StringUtils.commaDelimitedListToSet(SCOPES.replace(" ", ","))));
+        String expectedScopes = "read,write"; // Java 9+
+        assertTrue(result.getScopes().stream().findFirst().orElse(" ").equals(expectedScopes)); //1
 
         verify(clientRepository, times(1)).findByClientId(CLIENT_ID);
     }

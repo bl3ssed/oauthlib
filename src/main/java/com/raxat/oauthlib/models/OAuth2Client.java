@@ -88,7 +88,7 @@ public class OAuth2Client {
 
     public Set<String> getScopesSet() {
         return scopes == null ? Collections.emptySet() :
-                Arrays.stream(scopes.split(" "))
+                Arrays.stream(scopes.split(","))
                         .map(String::trim)
                         .collect(Collectors.toSet());
     }
