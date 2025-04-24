@@ -35,7 +35,6 @@ public class UserInfoController {
         return ResponseEntity.ok(user);
     }
 
-    // Обновление данных пользователя
     @PutMapping("/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         try {
